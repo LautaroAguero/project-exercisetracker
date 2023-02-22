@@ -1,7 +1,28 @@
-const express = require('express')
+import express from 'express'
+import dotenv from 'dotenv'
+import cors from 'cors'
+import {mongoose} from 'mongoose'
+import bodyParser from 'body-parser'
+
+
 const app = express()
-const cors = require('cors')
-require('dotenv').config()
+dotenv.config()
+
+const port = process.env.PORT || 3000;
+
+const connect = () => {
+  try{
+    mongoose.connect(process.env.URI,{
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    })
+    console.log('connected to Database')
+  }catch(err){
+    console.log('error connecting to Database'+err.message)
+  }
+}
+
+connect();
 
 app.use(cors())
 app.use(express.static('public'))
