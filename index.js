@@ -3,6 +3,15 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 import {mongoose} from 'mongoose'
 import bodyParser from 'body-parser'
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+import Exercise from './models/exercise.js';
+import User from './models/user.js';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 
 const app = express()
@@ -25,10 +34,41 @@ const connect = () => {
 connect();
 
 app.use(cors())
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
+app.use(bodyParser.json());
 app.use(express.static('public'))
+
+
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
 });
+
+app.post('/api/users',async (req, res) => {
+  try{
+    let user = await User.findOne({username: req.body.username})
+    if(user){
+      res.json({
+        username: user.username,
+        _id: user._id
+      })
+    } else {
+      user = new User({
+        username: req.body.username
+      })
+      user.save();
+      res.json({
+        username: user.username,
+        _id: user._id
+      })
+    }
+  } catch(err){
+    res.status(400).json('server error' + err.message)
+  }
+})
+
 
 
 
